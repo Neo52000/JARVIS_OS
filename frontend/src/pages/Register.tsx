@@ -23,9 +23,13 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await register(email, password, fullName);
-      setSuccess('Account created! Check your email to confirm, then sign in.');
-      setTimeout(() => navigate('/login'), 3000);
+      const autoLoggedIn = await register(email, password, fullName);
+      if (autoLoggedIn) {
+        navigate('/dashboard');
+      } else {
+        setSuccess('Account created! Check your email to confirm, then sign in.');
+        setTimeout(() => navigate('/login'), 3000);
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setError(message);

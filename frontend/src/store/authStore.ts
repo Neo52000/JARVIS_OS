@@ -7,7 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, fullName: string) => Promise<void>;
+  register: (email: string, password: string, fullName: string) => Promise<boolean>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -39,12 +39,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   register: async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     });
     if (error) throw error;
+    // If session exists, email confirmation is OFF — user is auto-logged in
+    return !!data.session;
   },
 
   logout: async () => {
