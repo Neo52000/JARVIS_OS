@@ -10,6 +10,8 @@ interface AuthState {
   register: (email: string, password: string, fullName: string) => Promise<boolean>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -45,12 +47,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       options: { data: { full_name: fullName } },
     });
     if (error) throw error;
-    // If session exists, email confirmation is OFF — user is auto-logged in
     return !!data.session;
   },
 
   logout: async () => {
     await supabase.auth.signOut();
     set({ user: null, isAuthenticated: false });
+  },
+
+  resetPassword: async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+  },
+
+  updatePassword: async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
   },
 }));
