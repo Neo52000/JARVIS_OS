@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-jarvis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jarvis_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-jarvis_os}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-jarvis}:${POSTGRES_PASSWORD:-jarvis_secret}@db:5432/${POSTGRES_DB:-jarvis_os}
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-random-secret-key}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_EXPIRY_MINUTES: ${JWT_EXPIRY_MINUTES:-30}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
