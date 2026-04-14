@@ -8,6 +8,8 @@ export default function Layout() {
   const { sidebarOpen, toggleSidebar, theme, setTheme } = useUIStore();
   const { user, logout } = useAuthStore();
 
+  const displayName = user?.user_metadata?.full_name || user?.email || '';
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
@@ -27,17 +29,17 @@ export default function Layout() {
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {user?.full_name}
+              {displayName}
             </span>
             <button
-              onClick={logout}
+              onClick={() => logout()}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
             >
               <LogOut size={20} />
             </button>
           </div>
         </header>
-        <main className={`flex-1 overflow-auto p-6 transition-all ${sidebarOpen ? '' : ''}`}>
+        <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
       </div>

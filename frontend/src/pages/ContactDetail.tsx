@@ -15,24 +15,17 @@ export default function ContactDetail() {
 
   useEffect(() => {
     if (!id) return;
-    contactsAPI.get(id).then((r) => {
-      setContact(r.data);
-      setForm({
-        name: r.data.name,
-        email: r.data.email || '',
-        phone: r.data.phone || '',
-        company: r.data.company || '',
-        position: r.data.position || '',
-        notes: r.data.notes || '',
-      });
+    contactsAPI.get(id).then((data) => {
+      setContact(data);
+      setForm({ name: data.name, email: data.email || '', phone: data.phone || '', company: data.company || '', position: data.position || '', notes: data.notes || '' });
       setLoading(false);
     });
   }, [id]);
 
   const handleSave = async () => {
     if (!id) return;
-    const r = await contactsAPI.update(id, form);
-    setContact(r.data);
+    const data = await contactsAPI.update(id, form);
+    setContact(data);
     setEditing(false);
   };
 
@@ -47,23 +40,15 @@ export default function ContactDetail() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <button onClick={() => navigate('/contacts')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700">
-        <ArrowLeft size={18} /> Back to Contacts
-      </button>
-
+      <button onClick={() => navigate('/contacts')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700"><ArrowLeft size={18} /> Back to Contacts</button>
       <div className="card">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">{contact.name}</h1>
           <div className="flex gap-2">
-            <button onClick={() => setEditing(!editing)} className="btn-secondary text-sm">
-              {editing ? 'Cancel' : 'Edit'}
-            </button>
-            <button onClick={handleDelete} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
-              <Trash2 size={18} />
-            </button>
+            <button onClick={() => setEditing(!editing)} className="btn-secondary text-sm">{editing ? 'Cancel' : 'Edit'}</button>
+            <button onClick={handleDelete} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"><Trash2 size={18} /></button>
           </div>
         </div>
-
         {editing ? (
           <div className="space-y-3">
             <div><label className="text-sm font-medium">Name</label><input className="input mt-1" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
@@ -76,11 +61,11 @@ export default function ContactDetail() {
           </div>
         ) : (
           <dl className="grid grid-cols-2 gap-4">
-            <div><dt className="text-sm text-gray-500">Email</dt><dd>{contact.email || '—'}</dd></div>
-            <div><dt className="text-sm text-gray-500">Phone</dt><dd>{contact.phone || '—'}</dd></div>
-            <div><dt className="text-sm text-gray-500">Company</dt><dd>{contact.company || '—'}</dd></div>
-            <div><dt className="text-sm text-gray-500">Position</dt><dd>{contact.position || '—'}</dd></div>
-            <div className="col-span-2"><dt className="text-sm text-gray-500">Notes</dt><dd className="whitespace-pre-wrap">{contact.notes || '—'}</dd></div>
+            <div><dt className="text-sm text-gray-500">Email</dt><dd>{contact.email || '\u2014'}</dd></div>
+            <div><dt className="text-sm text-gray-500">Phone</dt><dd>{contact.phone || '\u2014'}</dd></div>
+            <div><dt className="text-sm text-gray-500">Company</dt><dd>{contact.company || '\u2014'}</dd></div>
+            <div><dt className="text-sm text-gray-500">Position</dt><dd>{contact.position || '\u2014'}</dd></div>
+            <div className="col-span-2"><dt className="text-sm text-gray-500">Notes</dt><dd className="whitespace-pre-wrap">{contact.notes || '\u2014'}</dd></div>
           </dl>
         )}
       </div>

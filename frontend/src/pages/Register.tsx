@@ -8,6 +8,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const register = useAuthStore((s) => s.register);
   const navigate = useNavigate();
@@ -15,16 +16,23 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
     setLoading(true);
     try {
-      await register(email, password, fullName);
-      navigate('/login');
-    } catch {
-      setError('Registration failed. Email may already be in use.');
+      const autoLoggedIn = await register(email, password, fullName);
+      if (autoLoggedIn) {
+        navigate('/dashboard');
+      } else {
+        setSuccess('Account created! Check your email to confirm, then sign in.');
+        setTimeout(() => navigate('/login'), 3000);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -40,60 +48,33 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="card space-y-4">
           <h2 className="text-xl font-semibold text-center">Register</h2>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">{error}</div>
+          )}
+          {success && (
+            <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-3 rounded-lg text-sm">{success}</div>
           )}
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
-            <input
-              type="text"
-              className="input"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
+            <input type="text" className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              className="input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
+            <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Confirm Password</label>
-            <input
-              type="password"
-              className="input"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              minLength={6}
-            />
+            <input type="password" className="input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} />
           </div>
           <button type="submit" className="btn-primary w-full" disabled={loading}>
             {loading ? 'Creating account...' : 'Register'}
           </button>
           <p className="text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <Link to="/login" className="text-jarvis-600 hover:underline">
-              Sign In
-            </Link>
+            <Link to="/login" className="text-jarvis-600 hover:underline">Sign In</Link>
           </p>
         </form>
       </div>

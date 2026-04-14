@@ -17,8 +17,9 @@ export default function Login() {
     try {
       await login(email, password);
       navigate('/dashboard');
-    } catch {
-      setError('Invalid email or password');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Invalid email or password';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -40,32 +41,18 @@ export default function Login() {
           )}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              className="input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              className="input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <button type="submit" className="btn-primary w-full" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{' '}
-            <Link to="/register" className="text-jarvis-600 hover:underline">
-              Register
-            </Link>
+            <Link to="/register" className="text-jarvis-600 hover:underline">Register</Link>
           </p>
         </form>
       </div>

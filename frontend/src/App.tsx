@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -11,8 +12,24 @@ import Calendar from '@/pages/Calendar';
 import Notes from '@/pages/Notes';
 import AIChat from '@/pages/AIChat';
 import Settings from '@/pages/Settings';
+import { useAuthStore } from '@/store/authStore';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function App() {
+  const { initialize, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

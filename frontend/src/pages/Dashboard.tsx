@@ -10,8 +10,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    dashboardAPI.getStats().then((r) => {
-      setStats(r.data);
+    dashboardAPI.getStats().then((data) => {
+      setStats(data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -34,14 +34,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <Link to={card.link} key={card.label} className="card hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className={`${card.color} p-3 rounded-lg text-white`}>
-                <card.icon size={24} />
-              </div>
+              <div className={`${card.color} p-3 rounded-lg text-white`}><card.icon size={24} /></div>
               <div>
                 <p className="text-2xl font-bold">{card.value}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{card.label}</p>
@@ -50,12 +47,9 @@ export default function Dashboard() {
           </Link>
         ))}
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <CalendarDays size={20} /> Upcoming Events
-          </h2>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><CalendarDays size={20} /> Upcoming Events</h2>
           {stats.upcoming_events.length === 0 ? (
             <p className="text-gray-500 text-sm">No upcoming events</p>
           ) : (
@@ -63,15 +57,12 @@ export default function Dashboard() {
               {stats.upcoming_events.map((event) => (
                 <li key={event.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
                   <span className="font-medium">{event.title}</span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(event.start_time).toLocaleDateString()}
-                  </span>
+                  <span className="text-sm text-gray-500">{new Date(event.start_time).toLocaleDateString()}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
-
         <div className="card">
           <h2 className="text-lg font-semibold mb-4">Recent Notes</h2>
           {stats.recent_notes.length === 0 ? (
@@ -81,9 +72,7 @@ export default function Dashboard() {
               {stats.recent_notes.map((note) => (
                 <li key={note.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
                   <Link to="/notes" className="font-medium hover:text-jarvis-600">{note.title}</Link>
-                  <span className="text-sm text-gray-500">
-                    {new Date(note.updated_at).toLocaleDateString()}
-                  </span>
+                  <span className="text-sm text-gray-500">{new Date(note.updated_at).toLocaleDateString()}</span>
                 </li>
               ))}
             </ul>
