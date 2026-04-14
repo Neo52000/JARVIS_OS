@@ -24,7 +24,7 @@ export const contactsAPI = {
   list: (params?: { search?: string; skip?: number; limit?: number }) =>
     client.get<Contact[]>('/contacts', { params }),
   get: (id: string) => client.get<Contact>(`/contacts/${id}`),
-  create: (data: Omit<Contact, 'id' | 'user_id' | 'created_at' | 'updated_at'>) =>
+  create: (data: { name: string; email?: string; phone?: string; company?: string; position?: string; notes?: string }) =>
     client.post<Contact>('/contacts', data),
   update: (id: string, data: Partial<Contact>) =>
     client.put<Contact>(`/contacts/${id}`, data),
