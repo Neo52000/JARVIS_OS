@@ -30,29 +30,34 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-jarvis-600">JARVIS OS</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Business Operating System</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Système d'exploitation d'entreprise</p>
         </div>
         <form onSubmit={handleSubmit} className="card space-y-4">
-          <h2 className="text-xl font-semibold text-center">Sign In</h2>
+          <h2 className="text-xl font-semibold text-center">Se connecter</h2>
           {error && (
             <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
               {error}
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1">E-mail</label>
             <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-medium mb-1">Mot de passe</label>
             <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
+          <div className="text-right">
+            <Link to="/forgot-password" className="text-sm text-jarvis-600 hover:underline">
+              Mot de passe oublié ?
+            </Link>
+          </div>
           <button type="submit" className="btn-primary w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Connexion...' : 'Se connecter'}
           </button>
           <p className="text-center text-sm text-gray-500">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-jarvis-600 hover:underline">Register</Link>
+            Vous n'avez pas de compte ?{' '}
+            <Link to="/register" className="text-jarvis-600 hover:underline">Inscrivez-vous</Link>
           </p>
         </form>
       </div>
