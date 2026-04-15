@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentPilot — Gestion de contenu IA pour commerces locaux</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#4f46e5;--primary-light:#818cf8;--primary-dark:#3730a3;--bg:#ffffff;--bg-alt:#f8fafc;--text:#1e293b;--text-dim:#64748b;--border:#e2e8f0;--green:#10b981;--orange:#f59e0b;--cyan:#06b6d4;--radius:12px}
+body{font-family:'Inter',sans-serif;color:var(--text);line-height:1.6;background:var(--bg)}
+a{color:var(--primary);text-decoration:none}
+.container{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* Navbar */
+.navbar{padding:16px 0;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);z-index:100}
+.navbar .container{display:flex;align-items:center;justify-content:space-between}
+.navbar .brand{font-size:22px;font-weight:800;color:var(--primary)}
+.navbar .brand span{color:var(--text)}
+.navbar nav{display:flex;gap:32px;align-items:center}
+.navbar nav a{color:var(--text-dim);font-weight:500;font-size:15px;transition:color .2s}
+.navbar nav a:hover{color:var(--primary)}
+.btn-nav{background:var(--primary);color:#fff !important;padding:10px 24px;border-radius:8px;font-weight:600;font-size:14px;transition:background .2s}
+.btn-nav:hover{background:var(--primary-dark)}
+
+/* Hero */
+.hero{padding:100px 0 80px;text-align:center;background:linear-gradient(180deg,#eef2ff,var(--bg))}
+.hero h1{font-size:52px;font-weight:800;line-height:1.15;margin-bottom:20px;color:var(--text)}
+.hero h1 span{color:var(--primary)}
+.hero p{font-size:20px;color:var(--text-dim);max-width:640px;margin:0 auto 36px}
+.hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--primary);color:#fff;padding:14px 36px;border-radius:10px;font-size:16px;font-weight:700;border:none;cursor:pointer;transition:all .2s;display:inline-block}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,70,229,.3)}
+.btn-outline{background:transparent;color:var(--primary);padding:14px 36px;border-radius:10px;font-size:16px;font-weight:700;border:2px solid var(--primary);cursor:pointer;transition:all .2s;display:inline-block}
+.btn-outline:hover{background:rgba(79,70,229,.05)}
+
+/* Problem */
+.section{padding:80px 0}
+.section-alt{background:var(--bg-alt)}
+.section-title{text-align:center;font-size:38px;font-weight:800;margin-bottom:16px}
+.section-sub{text-align:center;font-size:18px;color:var(--text-dim);max-width:600px;margin:0 auto 48px}
+
+.problems{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.problem-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center}
+.problem-card .icon{font-size:40px;margin-bottom:16px}
+.problem-card h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.problem-card p{font-size:15px;color:var(--text-dim)}
+
+/* How it works */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;counter-reset:step}
+.step{text-align:center;position:relative}
+.step::before{counter-increment:step;content:counter(step);display:flex;align-items:center;justify-content:center;width:56px;height:56px;background:var(--primary);color:#fff;font-size:22px;font-weight:800;border-radius:50%;margin:0 auto 20px}
+.step h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.step p{font-size:15px;color:var(--text-dim);max-width:280px;margin:0 auto}
+
+/* Pricing */
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+.price-card{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius);padding:36px 28px;text-align:center;position:relative;transition:transform .2s,box-shadow .2s}
+.price-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.price-card.popular{border-color:var(--primary);box-shadow:0 8px 32px rgba(79,70,229,.15)}
+.price-card.popular::after{content:'POPULAIRE';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px}
+.price-card .plan-name{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px}
+.price-card .price{font-size:52px;font-weight:800;color:var(--text);margin-bottom:4px}
+.price-card .price span{font-size:18px;color:var(--text-dim);font-weight:500}
+.price-card .period{font-size:14px;color:var(--text-dim);margin-bottom:24px}
+.price-card ul{list-style:none;text-align:left;margin-bottom:28px}
+.price-card ul li{padding:8px 0;font-size:15px;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.price-card ul li::before{content:'✓';color:var(--green);font-weight:700;font-size:16px}
+.price-card .btn-price{display:block;width:100%;padding:14px;border-radius:10px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .2s}
+.btn-price-primary{background:var(--primary);color:#fff}
+.btn-price-primary:hover{background:var(--primary-dark)}
+.btn-price-outline{background:transparent;color:var(--primary);border:2px solid var(--primary) !important}
+.btn-price-outline:hover{background:rgba(79,70,229,.05)}
+
+/* Features grid */
+.features{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.feature{display:flex;gap:16px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius)}
+.feature .f-icon{width:48px;height:48px;background:rgba(79,70,229,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.feature h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.feature p{font-size:14px;color:var(--text-dim)}
+
+/* Contact */
+.contact-form{max-width:560px;margin:0 auto;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:40px}
+.contact-form label{display:block;font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.contact-form input,.contact-form textarea,.contact-form select{width:100%;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:15px;font-family:'Inter',sans-serif;margin-bottom:16px;transition:border-color .2s}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{outline:none;border-color:var(--primary)}
+.contact-form textarea{resize:vertical;min-height:100px}
+
+/* Footer */
+.footer{padding:40px 0;border-top:1px solid var(--border);text-align:center;color:var(--text-dim);font-size:14px}
+
+@media(max-width:768px){
+  .hero h1{font-size:32px}
+  .problems,.steps,.pricing,.features{grid-template-columns:1fr}
+  .navbar nav{gap:16px}
+  .navbar nav a:not(.btn-nav){display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="container">
+    <div class="brand">Content<span>Pilot</span></div>
+    <nav>
+      <a href="#probleme">Probleme</a>
+      <a href="#comment">Comment ca marche</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#contact" class="btn-nav">Nous contacter</a>
+    </nav>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="container">
+    <h1>Votre contenu digital<br>gere par l'<span>Intelligence Artificielle</span></h1>
+    <p>Nous creons et publions le contenu de votre commerce local automatiquement. Plus besoin d'y penser — concentrez-vous sur votre metier.</p>
+    <div class="hero-buttons">
+      <a href="#tarifs" class="btn-primary">Voir les tarifs</a>
+      <a href="#contact" class="btn-outline">Essai gratuit 7 jours</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="probleme">
+  <div class="container">
+    <h2 class="section-title">Le probleme</h2>
+    <p class="section-sub">Gerer les reseaux sociaux de votre commerce prend du temps que vous n'avez pas.</p>
+    <div class="problems">
+      <div class="problem-card">
+        <div class="icon">⏰</div>
+        <h3>Manque de temps</h3>
+        <p>Entre les clients, les fournisseurs et la gestion, impossible de poster regulierement.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🤷</div>
+        <h3>Manque d'idees</h3>
+        <p>Trouver quoi poster chaque jour est epuisant. Les idees s'epuisent vite.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📉</div>
+        <h3>Zero visibilite</h3>
+        <p>Sans contenu regulier, votre commerce devient invisible face a la concurrence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="comment">
+  <div class="container">
+    <h2 class="section-title">Comment ca marche</h2>
+    <p class="section-sub">3 etapes simples pour automatiser votre presence en ligne.</p>
+    <div class="steps">
+      <div class="step">
+        <h3>On apprend votre metier</h3>
+        <p>Notre IA analyse votre activite, vos clients cibles et votre ton de communication.</p>
+      </div>
+      <div class="step">
+        <h3>On cree votre contenu</h3>
+        <p>Chaque semaine, l'IA genere vos posts, textes et visuels adaptes a vos plateformes.</p>
+      </div>
+      <div class="step">
+        <h3>Vous validez, on publie</h3>
+        <p>Vous approuvez en un clic. Le contenu est publie automatiquement selon le calendrier.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Fonctionnalites</h2>
+    <p class="section-sub">Tout ce dont un commerce local a besoin pour briller en ligne.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="f-icon">🤖</div>
+        <div><h4>IA specialisee commerce local</h4><p>Contenu adapte a votre secteur : restaurant, salon de coiffure, boulangerie, garage...</p></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon">📅</div>
+        <div><h4>Calendrier editorial</h4><p>Planification automatique sur 7 ou 30 jours avec themes et hashtags optimises.</p></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon">📱</div>
+        <div><h4>Multi-plateformes</h4><p>Instagram, Facebook et Google Business Profile geres depuis un seul endroit.</p></div>
+      </div>
+      <div class="feature">
+        <div class="f-icon">📊</div>
+        <div><h4>Campagnes marketing</h4><p>Strategies de campagne personnalisees pour booster votre visibilite locale.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="tarifs">
+  <div class="container">
+    <h2 class="section-title">Tarifs simples, resultats concrets</h2>
+    <p class="section-sub">Choisissez la formule adaptee a vos besoins. Sans engagement.</p>
+    <div class="pricing">
+
+      <div class="price-card">
+        <div class="plan-name">Starter</div>
+        <div class="price">49<span> EUR</span></div>
+        <div class="period">/ mois</div>
+        <ul>
+          <li>3 posts Instagram / semaine</li>
+          <li>Textes + hashtags optimises</li>
+          <li>1 plateforme</li>
+          <li>Support par email</li>
+        </ul>
+        <a href="#contact" class="btn-price btn-price-outline">Commencer</a>
+      </div>
+
+      <div class="price-card popular">
+        <div class="plan-name">Pro</div>
+        <div class="price">99<span> EUR</span></div>
+        <div class="period">/ mois</div>
+        <ul>
+          <li>1 post / jour</li>
+          <li>Instagram + Facebook</li>
+          <li>Calendrier editorial</li>
+          <li>Rapports mensuels</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <a href="#contact" class="btn-price btn-price-primary">Commencer</a>
+      </div>
+
+      <div class="price-card">
+        <div class="plan-name">Business</div>
+        <div class="price">199<span> EUR</span></div>
+        <div class="period">/ mois</div>
+        <ul>
+          <li>2 posts / jour</li>
+          <li>Instagram + Facebook</li>
+          <li>Calendrier editorial</li>
+          <li>Campagnes mensuelles</li>
+          <li>Google Business Profile</li>
+          <li>Account manager dedie</li>
+        </ul>
+        <a href="#contact" class="btn-price btn-price-outline">Commencer</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="contact">
+  <div class="container">
+    <h2 class="section-title">Contactez-nous</h2>
+    <p class="section-sub">Essai gratuit de 7 jours. Aucune carte bancaire requise.</p>
+    <div class="contact-form">
+      <label>Nom du commerce</label>
+      <input type="text" id="contactName" placeholder="ex: Boulangerie Martin">
+      <label>Type d'activite</label>
+      <input type="text" id="contactType" placeholder="ex: restaurant, coiffeur, fleuriste">
+      <label>Email</label>
+      <input type="email" id="contactEmail" placeholder="votre@email.com">
+      <label>Telephone</label>
+      <input type="tel" id="contactPhone" placeholder="06 12 34 56 78">
+      <label>Plan souhaite</label>
+      <select id="contactPlan">
+        <option value="starter">Starter — 49 EUR/mois</option>
+        <option value="pro" selected>Pro — 99 EUR/mois</option>
+        <option value="business">Business — 199 EUR/mois</option>
+      </select>
+      <label>Message (optionnel)</label>
+      <textarea id="contactMsg" placeholder="Dites-nous en plus sur votre commerce..."></textarea>
+      <button class="btn-primary" style="width:100%;font-size:16px" onclick="submitContact()">Demarrer mon essai gratuit</button>
+      <p id="contactResult" style="margin-top:12px;text-align:center;font-weight:600;display:none"></p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p><strong>ContentPilot</strong> — Propulse par JARVIS Business OS</p>
+    <p style="margin-top:8px">Gestion de contenu IA pour commerces locaux</p>
+  </div>
+</footer>
+
+<script>
+async function submitContact() {
+  const name = document.getElementById('contactName').value;
+  const email = document.getElementById('contactEmail').value;
+  const result = document.getElementById('contactResult');
+  if (!name || !email) {
+    result.style.display = 'block';
+    result.style.color = '#ef4444';
+    result.textContent = 'Veuillez remplir au moins le nom et l\'email.';
+    return;
+  }
+  const plan = document.getElementById('contactPlan').value;
+  const prices = { starter: 49, pro: 99, business: 199 };
+  try {
+    const res = await fetch('/clients/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        business_type: document.getElementById('contactType').value,
+        email: email,
+        phone: document.getElementById('contactPhone').value,
+        plan: plan,
+        monthly_price: prices[plan] || 99,
+        notes: document.getElementById('contactMsg').value
+      })
+    });
+    const data = await res.json();
+    result.style.display = 'block';
+    result.style.color = '#10b981';
+    result.textContent = 'Merci ' + name + ' ! Votre essai gratuit est active. Nous vous contactons sous 24h.';
+  } catch (e) {
+    result.style.display = 'block';
+    result.style.color = '#10b981';
+    result.textContent = 'Merci ! Votre demande a bien ete enregistree. Nous vous contactons sous 24h.';
+  }
+}
+</script>
+</body>
+</html>

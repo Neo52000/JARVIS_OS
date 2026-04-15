@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS Business OS — Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--cyan:#00f0ff;--cyan-dim:rgba(0,240,255,.15);--cyan-glow:0 0 20px rgba(0,240,255,.4);--bg:#0a0e17;--panel:#0d1321;--border:rgba(0,240,255,.2);--text:#e0e6ed;--text-dim:#7a8ba0;--red:#ff3860;--green:#00e676;--orange:#ff9100;--purple:#b388ff}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,.015) 2px,rgba(0,240,255,.015) 4px);pointer-events:none;z-index:9999}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(0,240,255,.05),transparent)}
+.logo{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;color:var(--cyan);text-shadow:var(--cyan-glow);letter-spacing:3px}
+.logo span{color:var(--text-dim);font-weight:400;font-size:14px;margin-left:12px;letter-spacing:1px}
+.status-bar{display:flex;gap:16px;align-items:center}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Navigation */
+.nav{display:flex;gap:4px;padding:8px 24px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.3);overflow-x:auto}
+.nav button{background:transparent;border:1px solid transparent;color:var(--text-dim);padding:8px 20px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:all .2s;white-space:nowrap;border-radius:2px}
+.nav button:hover{color:var(--cyan);border-color:var(--border)}
+.nav button.active{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-dim);text-shadow:var(--cyan-glow)}
+
+/* Layout */
+.main{padding:20px 24px;max-width:1600px;margin:0 auto}
+.section{display:none}
+.section.active{display:block}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+.grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* Panels */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.panel h3{font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
+
+/* Forms */
+label{display:block;font-size:13px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+input,select,textarea{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--border);color:var(--text);padding:10px 12px;font-family:'Rajdhani',sans-serif;font-size:15px;border-radius:2px;margin-bottom:12px;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 8px rgba(0,240,255,.15)}
+textarea{resize:vertical;min-height:80px}
+
+/* Buttons */
+.btn{background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(0,240,255,.05));border:1px solid var(--cyan);color:var(--cyan);padding:10px 24px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all .2s;border-radius:2px}
+.btn:hover{background:rgba(0,240,255,.25);box-shadow:var(--cyan-glow)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-red{border-color:var(--red);color:var(--red);background:rgba(255,56,96,.1)}
+.btn-red:hover{background:rgba(255,56,96,.25)}
+.btn-green{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.1)}
+.btn-green:hover{background:rgba(0,230,118,.25)}
+
+/* Chat */
+.chat-box{height:400px;overflow-y:auto;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:12px}
+.chat-msg{margin-bottom:12px;padding:10px 14px;border-radius:4px;max-width:85%;line-height:1.5}
+.chat-msg.user{background:rgba(0,240,255,.1);border-left:3px solid var(--cyan);margin-left:auto}
+.chat-msg.bot{background:rgba(255,255,255,.05);border-left:3px solid var(--purple)}
+.chat-msg .agent-tag{font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.chat-input{display:flex;gap:8px}
+.chat-input input{flex:1;margin-bottom:0}
+
+/* Tables */
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table th{text-align:left;padding:8px 12px;color:var(--cyan);font-family:'Orbitron',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+.data-table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.data-table tr:hover td{background:rgba(0,240,255,.03)}
+
+/* Stats */
+.stat-card{text-align:center;padding:20px}
+.stat-card .value{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:var(--cyan);text-shadow:var(--cyan-glow)}
+.stat-card .label{font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+/* Tags */
+.tag{display:inline-block;padding:2px 10px;font-size:12px;border-radius:2px;text-transform:uppercase;letter-spacing:1px}
+.tag-starter{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.tag-pro{background:rgba(0,240,255,.15);color:var(--cyan);border:1px solid rgba(0,240,255,.3)}
+.tag-business{background:rgba(179,136,255,.15);color:var(--purple);border:1px solid rgba(179,136,255,.3)}
+.tag-active{background:rgba(0,230,118,.15);color:var(--green)}
+.tag-pending{background:rgba(255,145,0,.15);color:var(--orange)}
+.tag-paid{background:rgba(0,230,118,.15);color:var(--green)}
+
+/* Output */
+.output{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:4px;padding:14px;font-size:14px;line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;margin-top:12px}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--text-dim)}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">JARVIS <span>Business OS v1.0</span></div>
+  <div class="status-bar">
+    <span id="healthStatus" style="font-size:13px;color:var(--text-dim)">Connexion...</span>
+    <div class="status-dot" id="statusDot"></div>
+  </div>
+</div>
+
+<div class="nav" id="nav">
+  <button class="active" data-section="chat">Chat IA</button>
+  <button data-section="pod">Print-on-Demand</button>
+  <button data-section="business">Business Local</button>
+  <button data-section="crm">CRM / Clients</button>
+  <button data-section="revenue">Revenue</button>
+  <button data-section="delivery">Livraison</button>
+  <button data-section="scheduler">Scheduler</button>
+  <button data-section="agents">Agents</button>
+  <button data-section="memory">Memory</button>
+  <button data-section="logs">Logs</button>
+</div>
+
+<div class="main">
+
+  <!-- CHAT -->
+  <div class="section active" id="sec-chat">
+    <div class="panel">
+      <h3>Terminal IA</h3>
+      <div class="chat-box" id="chatBox">
+        <div class="chat-msg bot"><div class="agent-tag">JARVIS</div>Systeme operationnel. Comment puis-je vous aider ?</div>
+      </div>
+      <div class="chat-input">
+        <select id="chatAgent" style="width:140px;margin-bottom:0">
+          <option value="">Auto-route</option>
+          <option value="strategist">Strategist</option>
+          <option value="marketing">Marketing</option>
+          <option value="dev">Dev</option>
+          <option value="automation">Automation</option>
+          <option value="data">Data</option>
+        </select>
+        <input type="text" id="chatInput" placeholder="Entrez votre commande..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn" onclick="sendChat()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POD -->
+  <div class="section" id="sec-pod">
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>Creer un produit</h3>
+        <label>Niche</label>
+        <input type="text" id="podNiche" placeholder="ex: motivation, gaming, cats">
+        <label>Style</label>
+        <input type="text" id="podStyle" value="modern minimalist">
+        <button class="btn" onclick="createPodProduct()">Generer le produit</button>
+        <div class="output" id="podOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Batch (lot)</h3>
+        <label>Niche</label>
+        <input type="text" id="batchNiche" placeholder="ex: fitness">
+        <label>Nombre</label>
+        <input type="number" id="batchCount" value="5" min="1" max="20">
+        <label>Style</label>
+        <input type="text" id="batchStyle" value="modern minimalist">
+        <button class="btn" onclick="createPodBatch()">Generer le batch</button>
+        <div class="output" id="batchOutput" style="display:none"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>Produits generes</h3>
+      <button class="btn btn-sm" onclick="loadPodProducts()" style="margin-bottom:12px">Rafraichir</button>
+      <div id="podProductsList"><p class="loading">Cliquez sur Rafraichir</p></div>
+    </div>
+  </div>
+
+  <!-- BUSINESS LOCAL -->
+  <div class="section" id="sec-business">
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>Creer un post</h3>
+        <label>Nom du commerce</label>
+        <input type="text" id="bizName" placeholder="ex: Boulangerie Martin">
+        <label>Type</label>
+        <input type="text" id="bizType" placeholder="ex: boulangerie, restaurant">
+        <label>Sujet</label>
+        <input type="text" id="bizTopic" placeholder="ex: promotion ete">
+        <label>Plateforme</label>
+        <select id="bizPlatform">
+          <option value="instagram">Instagram</option>
+          <option value="facebook">Facebook</option>
+          <option value="google">Google Business</option>
+        </select>
+        <button class="btn" onclick="createBizPost()">Generer</button>
+        <div class="output" id="bizPostOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Calendrier editorial</h3>
+        <label>Nom du commerce</label>
+        <input type="text" id="calBizName" placeholder="ex: Pizzeria Roma">
+        <label>Type</label>
+        <input type="text" id="calBizType" placeholder="ex: pizzeria">
+        <label>Nombre de jours</label>
+        <input type="number" id="calDays" value="7" min="1" max="30">
+        <button class="btn" onclick="createCalendar()">Generer le calendrier</button>
+        <div class="output" id="calOutput" style="display:none"></div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="panel">
+        <h3>Campagne marketing</h3>
+        <label>Commerce</label>
+        <input type="text" id="campBiz" placeholder="ex: Salon Beaute Zen">
+        <label>Objectif</label>
+        <input type="text" id="campObj" placeholder="ex: augmenter les avis Google">
+        <label>Budget (EUR)</label>
+        <input type="number" id="campBudget" value="0" min="0">
+        <label>Duree (jours)</label>
+        <input type="number" id="campDays" value="30" min="1">
+        <button class="btn" onclick="createCampaign()">Creer la campagne</button>
+        <div class="output" id="campOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Recherche contenu</h3>
+        <label>Recherche</label>
+        <input type="text" id="bizSearch" placeholder="Rechercher dans le contenu..." onkeydown="if(event.key==='Enter')searchBizContent()">
+        <button class="btn" onclick="searchBizContent()">Rechercher</button>
+        <div class="output" id="bizSearchOutput" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM -->
+  <div class="section" id="sec-crm">
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>Ajouter un client</h3>
+        <label>Nom</label>
+        <input type="text" id="clientName" placeholder="ex: Restaurant Le Gourmet">
+        <label>Type d'activite</label>
+        <input type="text" id="clientBizType" placeholder="ex: restaurant">
+        <label>Email</label>
+        <input type="email" id="clientEmail" placeholder="contact@example.com">
+        <label>Telephone</label>
+        <input type="text" id="clientPhone" placeholder="06 12 34 56 78">
+        <label>Localisation</label>
+        <input type="text" id="clientLocation" placeholder="ex: Paris 11e">
+        <label>Plan</label>
+        <select id="clientPlan" onchange="updatePrice()">
+          <option value="starter">Starter (49 EUR/mois)</option>
+          <option value="pro">Pro (99 EUR/mois)</option>
+          <option value="business">Business (199 EUR/mois)</option>
+        </select>
+        <label>Prix mensuel (EUR)</label>
+        <input type="number" id="clientPrice" value="49" min="0">
+        <label>Notes</label>
+        <textarea id="clientNotes" rows="2" placeholder="Notes..."></textarea>
+        <button class="btn" onclick="addClient()">Ajouter</button>
+        <div class="output" id="clientAddOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Liste des clients</h3>
+        <button class="btn btn-sm" onclick="loadClients()" style="margin-bottom:12px">Rafraichir</button>
+        <div id="clientsList"><p class="loading">Cliquez sur Rafraichir</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="section" id="sec-revenue">
+    <div class="panel" style="margin-bottom:16px">
+      <h3>Tableau de bord revenus</h3>
+      <button class="btn btn-sm" onclick="loadRevenue()">Rafraichir</button>
+    </div>
+    <div class="grid grid-4" id="revenueCards">
+      <div class="panel stat-card"><div class="value" id="revMRR">--</div><div class="label">MRR</div></div>
+      <div class="panel stat-card"><div class="value" id="revARR">--</div><div class="label">ARR</div></div>
+      <div class="panel stat-card"><div class="value" id="revClients">--</div><div class="label">Clients actifs</div></div>
+      <div class="panel stat-card"><div class="value" id="revContent">--</div><div class="label">Contenus generes</div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="panel stat-card"><div class="value" id="revCollected">--</div><div class="label">Total encaisse</div></div>
+      <div class="panel stat-card"><div class="value" id="revPending">--</div><div class="label">En attente</div></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>Factures</h3>
+      <button class="btn btn-sm" onclick="loadInvoices()" style="margin-bottom:12px">Charger</button>
+      <div id="invoicesList"></div>
+    </div>
+  </div>
+
+  <!-- DELIVERY -->
+  <div class="section" id="sec-delivery">
+    <div class="grid grid-3">
+      <div class="panel">
+        <h3>Livraison client</h3>
+        <label>ID Client</label>
+        <input type="text" id="deliveryClientId" placeholder="ex: a1b2c3d4">
+        <button class="btn" onclick="deliverToClient()">Generer livraison</button>
+        <div class="output" id="deliveryOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Livraison globale</h3>
+        <p style="color:var(--text-dim);margin-bottom:12px">Generer le contenu pour tous les clients actifs.</p>
+        <button class="btn" onclick="deliverAll()">Livrer a tous</button>
+        <div class="output" id="deliveryAllOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Facturation batch</h3>
+        <p style="color:var(--text-dim);margin-bottom:12px">Generer les factures mensuelles pour tous les clients.</p>
+        <button class="btn" onclick="batchInvoices()">Generer les factures</button>
+        <div class="output" id="batchInvoiceOutput" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULER -->
+  <div class="section" id="sec-scheduler">
+    <div class="grid grid-3">
+      <div class="panel">
+        <h3>POD quotidien</h3>
+        <label>Niche</label>
+        <input type="text" id="schedNiche" value="trending">
+        <label>Nombre</label>
+        <input type="number" id="schedCount" value="3" min="1" max="20">
+        <label>Heure</label>
+        <input type="number" id="schedPodHour" value="9" min="0" max="23">
+        <button class="btn" onclick="schedulePod()">Planifier</button>
+        <button class="btn btn-green btn-sm" onclick="runPodNow()" style="margin-top:8px">Executer maintenant</button>
+      </div>
+      <div class="panel">
+        <h3>Contenu quotidien</h3>
+        <label>Heure</label>
+        <input type="number" id="schedContentHour" value="8" min="0" max="23">
+        <button class="btn" onclick="scheduleContent()">Planifier</button>
+        <button class="btn btn-green btn-sm" onclick="runContentNow()" style="margin-top:8px">Executer maintenant</button>
+      </div>
+      <div class="panel">
+        <h3>Rapport hebdo</h3>
+        <p style="color:var(--text-dim);margin-bottom:12px">Rapport automatique chaque lundi a 9h.</p>
+        <button class="btn" onclick="scheduleReport()">Planifier</button>
+        <button class="btn btn-green btn-sm" onclick="runReportNow()" style="margin-top:8px">Executer maintenant</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3>Jobs planifies</h3>
+      <button class="btn btn-sm" onclick="loadJobs()" style="margin-bottom:12px">Rafraichir</button>
+      <div id="jobsList"><p class="loading">Cliquez sur Rafraichir</p></div>
+    </div>
+    <div class="output" id="schedOutput" style="display:none;margin-top:12px"></div>
+  </div>
+
+  <!-- AGENTS -->
+  <div class="section" id="sec-agents">
+    <div class="panel">
+      <h3>Agents IA disponibles</h3>
+      <button class="btn btn-sm" onclick="loadAgents()" style="margin-bottom:12px">Charger</button>
+      <div id="agentsList"><p class="loading">Cliquez sur Charger</p></div>
+    </div>
+  </div>
+
+  <!-- MEMORY -->
+  <div class="section" id="sec-memory">
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>Stocker en memoire</h3>
+        <label>Texte</label>
+        <textarea id="memText" rows="4" placeholder="Information a memoriser..."></textarea>
+        <button class="btn" onclick="storeMemory()">Stocker</button>
+        <div class="output" id="memStoreOutput" style="display:none"></div>
+      </div>
+      <div class="panel">
+        <h3>Recherche semantique</h3>
+        <label>Requete</label>
+        <input type="text" id="memQuery" placeholder="Rechercher dans la memoire..." onkeydown="if(event.key==='Enter')searchMemory()">
+        <label>Limite</label>
+        <input type="number" id="memLimit" value="5" min="1" max="20">
+        <button class="btn" onclick="searchMemory()">Rechercher</button>
+        <div class="output" id="memSearchOutput" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGS -->
+  <div class="section" id="sec-logs">
+    <div class="panel">
+      <h3>Journal d'execution</h3>
+      <button class="btn btn-sm" onclick="loadLogs()" style="margin-bottom:12px">Rafraichir</button>
+      <div id="logsList"><p class="loading">Cliquez sur Rafraichir</p></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = window.location.origin;
+
+// --- Navigation ---
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('sec-' + btn.dataset.section).classList.add('active');
+  });
+});
+
+// --- Helpers ---
+async function api(path, opts = {}) {
+  const url = API + path;
+  const config = { headers: { 'Content-Type': 'application/json' }, ...opts };
+  if (config.body && typeof config.body === 'object') config.body = JSON.stringify(config.body);
+  const res = await fetch(url, config);
+  return res.json();
+}
+
+function show(id, data) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// --- Health ---
+async function checkHealth() {
+  try {
+    const d = await api('/health');
+    document.getElementById('healthStatus').textContent = 'LLM: ' + d.llm + ' | Agents: ' + d.agents;
+    document.getElementById('statusDot').style.background = d.status === 'ok' ? 'var(--green)' : 'var(--red)';
+  } catch {
+    document.getElementById('healthStatus').textContent = 'Hors ligne';
+    document.getElementById('statusDot').style.background = 'var(--red)';
+  }
+}
+checkHealth();
+setInterval(checkHealth, 30000);
+
+// --- Chat ---
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const agent = document.getElementById('chatAgent').value;
+  const box = document.getElementById('chatBox');
+  box.innerHTML += '<div class="chat-msg user">' + esc(msg) + '</div>';
+  input.value = '';
+  box.scrollTop = box.scrollHeight;
+  try {
+    const d = await api('/chat', { method: 'POST', body: { message: msg, agent: agent || null } });
+    box.innerHTML += '<div class="chat-msg bot"><div class="agent-tag">' + esc(d.agent || 'jarvis') + '</div>' + esc(d.response) + '</div>';
+  } catch (e) {
+    box.innerHTML += '<div class="chat-msg bot" style="border-color:var(--red)">Erreur: ' + esc(e.message) + '</div>';
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+// --- POD ---
+async function createPodProduct() {
+  const niche = document.getElementById('podNiche').value;
+  const style = document.getElementById('podStyle').value;
+  if (!niche) return;
+  show('podOutput', 'Generation en cours...');
+  const d = await api('/pod/product', { method: 'POST', body: { niche, style } });
+  show('podOutput', d);
+}
+
+async function createPodBatch() {
+  const niche = document.getElementById('batchNiche').value;
+  const count = parseInt(document.getElementById('batchCount').value);
+  const style = document.getElementById('batchStyle').value;
+  if (!niche) return;
+  show('batchOutput', 'Generation du batch...');
+  const d = await api('/pod/batch', { method: 'POST', body: { niche, count, style } });
+  show('batchOutput', d);
+}
+
+async function loadPodProducts() {
+  const d = await api('/pod/products?limit=20');
+  const el = document.getElementById('podProductsList');
+  if (!d.products || d.products.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucun produit.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>Niche</th><th>Style</th><th>Date</th></tr>';
+  d.products.forEach(p => {
+    html += '<tr><td>' + esc(p.niche || '--') + '</td><td>' + esc(p.style || '--') + '</td><td>' + esc(p.created_at || '--') + '</td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+
+// --- Business ---
+async function createBizPost() {
+  show('bizPostOutput', 'Generation...');
+  const d = await api('/business/post', { method: 'POST', body: {
+    business_name: document.getElementById('bizName').value,
+    business_type: document.getElementById('bizType').value,
+    topic: document.getElementById('bizTopic').value,
+    platform: document.getElementById('bizPlatform').value
+  }});
+  show('bizPostOutput', d);
+}
+
+async function createCalendar() {
+  show('calOutput', 'Generation du calendrier...');
+  const d = await api('/business/calendar', { method: 'POST', body: {
+    business_name: document.getElementById('calBizName').value,
+    business_type: document.getElementById('calBizType').value,
+    days: parseInt(document.getElementById('calDays').value)
+  }});
+  show('calOutput', d);
+}
+
+async function createCampaign() {
+  show('campOutput', 'Creation de la campagne...');
+  const d = await api('/business/campaign', { method: 'POST', body: {
+    business_name: document.getElementById('campBiz').value,
+    objective: document.getElementById('campObj').value,
+    budget_eur: parseFloat(document.getElementById('campBudget').value),
+    duration_days: parseInt(document.getElementById('campDays').value)
+  }});
+  show('campOutput', d);
+}
+
+async function searchBizContent() {
+  const q = document.getElementById('bizSearch').value;
+  if (!q) return;
+  show('bizSearchOutput', 'Recherche...');
+  const d = await api('/business/search?q=' + encodeURIComponent(q));
+  show('bizSearchOutput', d);
+}
+
+// --- CRM ---
+function updatePrice() {
+  const prices = { starter: 49, pro: 99, business: 199 };
+  document.getElementById('clientPrice').value = prices[document.getElementById('clientPlan').value] || 49;
+}
+
+async function addClient() {
+  show('clientAddOutput', 'Ajout...');
+  const d = await api('/clients/', { method: 'POST', body: {
+    name: document.getElementById('clientName').value,
+    business_type: document.getElementById('clientBizType').value,
+    email: document.getElementById('clientEmail').value,
+    phone: document.getElementById('clientPhone').value,
+    location: document.getElementById('clientLocation').value,
+    plan: document.getElementById('clientPlan').value,
+    monthly_price: parseFloat(document.getElementById('clientPrice').value),
+    notes: document.getElementById('clientNotes').value
+  }});
+  show('clientAddOutput', d);
+}
+
+async function loadClients() {
+  const d = await api('/clients/?status=active');
+  const el = document.getElementById('clientsList');
+  if (!d.clients || d.clients.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucun client.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>ID</th><th>Nom</th><th>Type</th><th>Plan</th><th>Prix</th><th>Contenus</th></tr>';
+  d.clients.forEach(c => {
+    const tagClass = 'tag-' + (c.plan || 'starter');
+    html += '<tr><td><code>' + esc(c.id) + '</code></td><td>' + esc(c.name) + '</td><td>' + esc(c.business_type) + '</td>'
+      + '<td><span class="tag ' + tagClass + '">' + esc(c.plan) + '</span></td>'
+      + '<td>' + c.monthly_price + ' EUR</td><td>' + (c.content_generated || 0) + '</td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+
+// --- Revenue ---
+async function loadRevenue() {
+  const d = await api('/clients/revenue');
+  if (!d.stats) return;
+  const s = d.stats;
+  document.getElementById('revMRR').textContent = s.mrr + ' EUR';
+  document.getElementById('revARR').textContent = s.arr + ' EUR';
+  document.getElementById('revClients').textContent = s.active_clients;
+  document.getElementById('revContent').textContent = s.total_content_generated;
+  document.getElementById('revCollected').textContent = s.total_revenue_collected + ' EUR';
+  document.getElementById('revPending').textContent = s.total_pending + ' EUR';
+}
+
+async function loadInvoices() {
+  const d = await api('/clients/invoices/all');
+  const el = document.getElementById('invoicesList');
+  if (!d.invoices || d.invoices.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucune facture.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>ID</th><th>Client</th><th>Montant</th><th>Periode</th><th>Statut</th><th>Action</th></tr>';
+  d.invoices.forEach(i => {
+    const tagClass = i.status === 'paid' ? 'tag-paid' : 'tag-pending';
+    const payBtn = i.status === 'pending' ? '<button class="btn btn-green btn-sm" onclick="payInvoice(\'' + i.id + '\')">Payer</button>' : '--';
+    html += '<tr><td><code>' + esc(i.id) + '</code></td><td>' + esc(i.client_name) + '</td><td>' + i.amount + ' EUR</td>'
+      + '<td>' + esc(i.period) + '</td><td><span class="tag ' + tagClass + '">' + esc(i.status) + '</span></td><td>' + payBtn + '</td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+
+async function payInvoice(id) {
+  await api('/clients/invoices/' + id + '/pay', { method: 'POST' });
+  loadInvoices();
+  loadRevenue();
+}
+
+// --- Delivery ---
+async function deliverToClient() {
+  const id = document.getElementById('deliveryClientId').value;
+  if (!id) return;
+  show('deliveryOutput', 'Generation...');
+  const d = await api('/delivery/client/' + id, { method: 'POST' });
+  show('deliveryOutput', d);
+}
+
+async function deliverAll() {
+  show('deliveryAllOutput', 'Livraison a tous les clients...');
+  const d = await api('/delivery/all', { method: 'POST' });
+  show('deliveryAllOutput', d);
+}
+
+async function batchInvoices() {
+  show('batchInvoiceOutput', 'Generation des factures...');
+  const d = await api('/delivery/invoices/batch', { method: 'POST' });
+  show('batchInvoiceOutput', d);
+}
+
+// --- Scheduler ---
+async function schedulePod() {
+  const d = await api('/scheduler/pod/daily', { method: 'POST', body: {
+    niche: document.getElementById('schedNiche').value,
+    count: parseInt(document.getElementById('schedCount').value),
+    hour: parseInt(document.getElementById('schedPodHour').value), minute: 0
+  }});
+  show('schedOutput', d);
+}
+async function scheduleContent() {
+  const d = await api('/scheduler/content/daily', { method: 'POST', body: {
+    hour: parseInt(document.getElementById('schedContentHour').value), minute: 0
+  }});
+  show('schedOutput', d);
+}
+async function scheduleReport() {
+  const d = await api('/scheduler/report/weekly', { method: 'POST' });
+  show('schedOutput', d);
+}
+async function runPodNow() {
+  show('schedOutput', 'Execution POD...');
+  const d = await api('/scheduler/run/pod', { method: 'POST', body: {
+    niche: document.getElementById('schedNiche').value,
+    count: parseInt(document.getElementById('schedCount').value)
+  }});
+  show('schedOutput', d);
+}
+async function runContentNow() {
+  show('schedOutput', 'Execution contenu...');
+  const d = await api('/scheduler/run/content', { method: 'POST' });
+  show('schedOutput', d);
+}
+async function runReportNow() {
+  show('schedOutput', 'Generation du rapport...');
+  const d = await api('/scheduler/run/report', { method: 'POST' });
+  show('schedOutput', d);
+}
+async function loadJobs() {
+  const d = await api('/scheduler/jobs');
+  const el = document.getElementById('jobsList');
+  if (!d.jobs || d.jobs.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucun job planifie.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>ID</th><th>Prochain lancement</th><th>Action</th></tr>';
+  d.jobs.forEach(j => {
+    html += '<tr><td><code>' + esc(j.id || j) + '</code></td><td>' + esc(j.next_run || '--') + '</td>'
+      + '<td><button class="btn btn-red btn-sm" onclick="removeJob(\'' + esc(j.id || j) + '\')">Supprimer</button></td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+async function removeJob(id) {
+  await api('/scheduler/jobs/' + id, { method: 'DELETE' });
+  loadJobs();
+}
+
+// --- Agents ---
+async function loadAgents() {
+  const d = await api('/agents');
+  const el = document.getElementById('agentsList');
+  if (!d.agents || d.agents.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucun agent.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>Nom</th><th>Role</th><th>Mots-cles</th></tr>';
+  d.agents.forEach(a => {
+    html += '<tr><td style="color:var(--cyan);font-weight:600">' + esc(a.name || a) + '</td><td>' + esc(a.role || '--') + '</td><td>' + esc((a.keywords || []).join(', ')) + '</td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+
+// --- Memory ---
+async function storeMemory() {
+  const text = document.getElementById('memText').value;
+  if (!text) return;
+  show('memStoreOutput', 'Stockage...');
+  const d = await api('/memory/store', { method: 'POST', body: { text } });
+  show('memStoreOutput', d);
+}
+
+async function searchMemory() {
+  const q = document.getElementById('memQuery').value;
+  if (!q) return;
+  show('memSearchOutput', 'Recherche...');
+  const d = await api('/memory/search?q=' + encodeURIComponent(q) + '&limit=' + document.getElementById('memLimit').value);
+  show('memSearchOutput', d);
+}
+
+// --- Logs ---
+async function loadLogs() {
+  const d = await api('/logs?limit=30');
+  const el = document.getElementById('logsList');
+  if (!d.logs || d.logs.length === 0) { el.innerHTML = '<p style="color:var(--text-dim)">Aucun log.</p>'; return; }
+  let html = '<table class="data-table"><tr><th>Date</th><th>Agent</th><th>Message</th><th>OK</th></tr>';
+  d.logs.forEach(l => {
+    const ok = l.success ? '<span style="color:var(--green)">OK</span>' : '<span style="color:var(--red)">FAIL</span>';
+    html += '<tr><td style="white-space:nowrap">' + esc(l.timestamp || '--') + '</td><td style="color:var(--cyan)">' + esc(l.agent || '--') + '</td><td>' + esc((l.message || l.output || '--').substring(0, 120)) + '</td><td>' + ok + '</td></tr>';
+  });
+  el.innerHTML = html + '</table>';
+}
+</script>
+</body>
+</html>
