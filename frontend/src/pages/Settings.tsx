@@ -19,7 +19,7 @@ export default function Settings() {
       <div className="card">
         <h2 className="text-sm font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider mb-4">About</h2>
         <div className="space-y-2 text-sm text-[#7a8ba0]">
-          <p><strong className="text-[#00f0ff]">JARVIS OS</strong> — Business Operating System</p>
+          <p><strong className="text-[#00f0ff]">JARVIS OS</strong> \u2014 Business Operating System</p>
           <p>Version 1.0.0</p>
           <p>Powered by Supabase + React + TypeScript</p>
           <p className="text-xs mt-4 uppercase tracking-wider">Iron Man HUD Interface</p>
