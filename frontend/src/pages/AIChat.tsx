@@ -53,9 +53,7 @@ export default function AIChat() {
                 </div>
               )}
               <div
-                className={`max-w-[70%] px-4 py-2 rounded-sm ${
-                  msg.role === 'user' ? '' : ''
-                }`}
+                className="max-w-[70%] px-4 py-2 rounded-sm"
                 style={
                   msg.role === 'user'
                     ? { background: 'rgba(0,240,255,0.1)', borderLeft: '3px solid #00f0ff' }
