@@ -27,11 +27,11 @@ export default function Register() {
       if (autoLoggedIn) {
         navigate('/dashboard');
       } else {
-        setSuccess('Compte créé ! Vérifiez votre e-mail pour confirmer, puis connectez-vous.');
+        setSuccess('Compte cree ! Verifiez votre e-mail pour confirmer, puis connectez-vous.');
         setTimeout(() => navigate('/login'), 3000);
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Échec de l\'inscription';
+      const message = err instanceof Error ? err.message : 'Echec de l\'inscription';
       setError(message);
     } finally {
       setLoading(false);
@@ -39,42 +39,51 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#0a0e17' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-jarvis-600">JARVIS OS</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Créez votre compte</p>
+          <h1
+            className="text-4xl font-orbitron font-black text-[#00f0ff] tracking-[4px]"
+            style={{ textShadow: '0 0 30px rgba(0,240,255,0.5)' }}
+          >
+            JARVIS
+          </h1>
+          <p className="text-[#7a8ba0] mt-2 uppercase tracking-wider text-sm">Creez votre compte</p>
         </div>
         <form onSubmit={handleSubmit} className="card space-y-4">
-          <h2 className="text-xl font-semibold text-center">Inscription</h2>
+          <h2 className="text-lg font-orbitron font-bold text-[#00f0ff] text-center uppercase tracking-wider">Inscription</h2>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">{error}</div>
+            <div className="p-3 rounded-sm text-sm" style={{ background: 'rgba(255,56,96,0.1)', border: '1px solid rgba(255,56,96,0.3)', color: '#ff3860' }}>
+              {error}
+            </div>
           )}
           {success && (
-            <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-3 rounded-lg text-sm">{success}</div>
+            <div className="p-3 rounded-sm text-sm" style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.3)', color: '#00e676' }}>
+              {success}
+            </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-1">Nom et prénom</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">Nom et prenom</label>
             <input type="text" className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">E-mail</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">E-mail</label>
             <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Mot de passe</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">Mot de passe</label>
             <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Confirmez le mot de passe</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">Confirmez le mot de passe</label>
             <input type="password" className="input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} />
           </div>
           <button type="submit" className="btn-primary w-full" disabled={loading}>
-            {loading ? 'Création du compte...' : 'S\'inscrire'}
+            {loading ? 'Creation du compte...' : 'S\'inscrire'}
           </button>
-          <p className="text-center text-sm text-gray-500">
-            Vous avez déjà un compte ?{' '}
-            <Link to="/login" className="text-jarvis-600 hover:underline">Se connecter</Link>
+          <p className="text-center text-sm text-[#7a8ba0]">
+            Vous avez deja un compte ?{' '}
+            <Link to="/login" className="text-[#00f0ff] hover:underline">Se connecter</Link>
           </p>
         </form>
       </div>

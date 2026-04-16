@@ -27,12 +27,22 @@ export default function Sidebar() {
     <aside
       className={`${
         sidebarOpen ? 'w-64' : 'w-20'
-      } bg-jarvis-950 text-white flex flex-col transition-all duration-300 shrink-0`}
+      } flex flex-col transition-all duration-300 shrink-0`}
+      style={{ background: '#0d1321', borderRight: '1px solid rgba(0,240,255,0.2)' }}
     >
-      <div className="h-16 flex items-center justify-center border-b border-jarvis-800">
-        <h1 className={`font-bold ${sidebarOpen ? 'text-xl' : 'text-sm'}`}>
-          {sidebarOpen ? 'JARVIS OS' : 'J'}
+      <div
+        className="h-16 flex items-center justify-center"
+        style={{ borderBottom: '1px solid rgba(0,240,255,0.2)' }}
+      >
+        <h1
+          className={`font-orbitron font-black text-[#00f0ff] ${sidebarOpen ? 'text-xl tracking-[3px]' : 'text-sm'}`}
+          style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}
+        >
+          {sidebarOpen ? 'JARVIS' : 'J'}
         </h1>
+        {sidebarOpen && (
+          <span className="text-[#7a8ba0] text-xs font-normal ml-3 tracking-wider">OS v1.0</span>
+        )}
       </div>
       <nav className="flex-1 py-4">
         {navItems.map(({ to, icon: Icon, label }) => (
@@ -40,11 +50,16 @@ export default function Sidebar() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
+              `flex items-center gap-3 px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-200 ${
                 isActive
-                  ? 'bg-jarvis-800 text-white border-r-2 border-jarvis-400'
-                  : 'text-jarvis-300 hover:bg-jarvis-900 hover:text-white'
+                  ? 'text-[#00f0ff] border-r-2 border-[#00f0ff]'
+                  : 'text-[#7a8ba0] hover:text-[#00f0ff]'
               }`
+            }
+            style={({ isActive }) =>
+              isActive
+                ? { background: 'rgba(0,240,255,0.1)', textShadow: '0 0 20px rgba(0,240,255,0.4)' }
+                : { background: 'transparent' }
             }
           >
             <Icon size={20} />

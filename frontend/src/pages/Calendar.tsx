@@ -51,32 +51,44 @@ export default function Calendar() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Calendar</h1>
+        <h1 className="text-2xl font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider" style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>Calendar</h1>
         <button className="btn-primary flex items-center gap-2" onClick={() => { setForm({ title: '', description: '', start_time: '', end_time: '', location: '' }); setShowModal(true); }}><Plus size={18} /> Add Event</button>
       </div>
       <div className="card">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><ChevronLeft size={20} /></button>
-          <h2 className="text-lg font-semibold">{MONTH_NAMES[month]} {year}</h2>
-          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><ChevronRight size={20} /></button>
+          <button onClick={prevMonth} className="p-2 text-[#7a8ba0] hover:text-[#00f0ff] rounded-sm transition-colors"><ChevronLeft size={20} /></button>
+          <h2 className="text-lg font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider">{MONTH_NAMES[month]} {year}</h2>
+          <button onClick={nextMonth} className="p-2 text-[#7a8ba0] hover:text-[#00f0ff] rounded-sm transition-colors"><ChevronRight size={20} /></button>
         </div>
         {loading ? <div className="flex justify-center py-10"><LoadingSpinner /></div> : (
           <>
             <div className="grid grid-cols-7 gap-px mb-1">
-              {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d) => <div key={d} className="text-center text-xs font-medium text-gray-500 py-2">{d}</div>)}
+              {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d) => (
+                <div key={d} className="text-center text-xs font-orbitron text-[#00f0ff] uppercase tracking-wider py-2">{d}</div>
+              ))}
             </div>
-            <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-              {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} className="bg-gray-50 dark:bg-gray-800 h-24" />)}
+            <div className="grid grid-cols-7 gap-px rounded-sm overflow-hidden" style={{ background: 'rgba(0,240,255,0.1)', border: '1px solid rgba(0,240,255,0.2)' }}>
+              {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} className="h-24" style={{ background: '#0a0e17' }} />)}
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1;
                 const dayEvents = getEventsForDay(day);
                 const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
                 return (
-                  <div key={day} onClick={() => handleDayClick(day)} className={`bg-white dark:bg-gray-800 h-24 p-1 cursor-pointer hover:bg-jarvis-50 dark:hover:bg-jarvis-900/20 ${isToday ? 'ring-2 ring-inset ring-jarvis-500' : ''}`}>
-                    <span className={`text-sm font-medium ${isToday ? 'text-jarvis-600' : ''}`}>{day}</span>
+                  <div
+                    key={day}
+                    onClick={() => handleDayClick(day)}
+                    className="h-24 p-1 cursor-pointer transition-colors hover:bg-[rgba(0,240,255,0.05)]"
+                    style={{
+                      background: '#0d1321',
+                      ...(isToday ? { boxShadow: 'inset 0 0 0 2px #00f0ff' } : {}),
+                    }}
+                  >
+                    <span className={`text-sm font-medium ${isToday ? 'text-[#00f0ff]' : 'text-[#e0e6ed]'}`}>{day}</span>
                     <div className="mt-1 space-y-0.5">
-                      {dayEvents.slice(0, 3).map((ev) => <div key={ev.id} className="text-xs bg-jarvis-100 dark:bg-jarvis-900/40 text-jarvis-700 dark:text-jarvis-300 px-1 rounded truncate">{ev.title}</div>)}
-                      {dayEvents.length > 3 && <div className="text-xs text-gray-500">+{dayEvents.length - 3} more</div>}
+                      {dayEvents.slice(0, 3).map((ev) => (
+                        <div key={ev.id} className="text-xs px-1 rounded-sm truncate" style={{ background: 'rgba(0,240,255,0.15)', color: '#00f0ff' }}>{ev.title}</div>
+                      ))}
+                      {dayEvents.length > 3 && <div className="text-xs text-[#7a8ba0]">+{dayEvents.length - 3} more</div>}
                     </div>
                   </div>
                 );
@@ -90,8 +102,8 @@ export default function Calendar() {
           <input className="input" placeholder="Event title *" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
           <textarea className="input" placeholder="Description" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="text-sm font-medium">Start</label><input className="input mt-1" type="datetime-local" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} required /></div>
-            <div><label className="text-sm font-medium">End</label><input className="input mt-1" type="datetime-local" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} required /></div>
+            <div><label className="text-xs font-semibold text-[#7a8ba0] uppercase tracking-wider">Start</label><input className="input mt-1" type="datetime-local" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} required /></div>
+            <div><label className="text-xs font-semibold text-[#7a8ba0] uppercase tracking-wider">End</label><input className="input mt-1" type="datetime-local" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} required /></div>
           </div>
           <input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
           <button type="submit" className="btn-primary w-full">Create Event</button>

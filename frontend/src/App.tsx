@@ -26,7 +26,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen" style={{ background: '#0a0e17' }}>
         <LoadingSpinner size="lg" />
       </div>
     );

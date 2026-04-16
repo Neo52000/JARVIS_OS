@@ -7,14 +7,19 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 const STATUS_LABELS: Record<TaskStatus, string> = { todo: 'To Do', in_progress: 'In Progress', done: 'Done' };
 const STATUS_COLORS: Record<TaskStatus, string> = {
-  todo: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  in_progress: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  done: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  todo: 'text-[#ff9100]',
+  in_progress: 'text-[#00f0ff]',
+  done: 'text-[#00e676]',
 };
-const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  low: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
-  medium: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-  high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+const STATUS_BG: Record<TaskStatus, React.CSSProperties> = {
+  todo: { background: 'rgba(255,145,0,0.15)', border: '1px solid rgba(255,145,0,0.3)', color: '#ff9100' },
+  in_progress: { background: 'rgba(0,240,255,0.15)', border: '1px solid rgba(0,240,255,0.3)', color: '#00f0ff' },
+  done: { background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.3)', color: '#00e676' },
+};
+const PRIORITY_STYLES: Record<TaskPriority, React.CSSProperties> = {
+  low: { background: 'rgba(122,139,160,0.15)', color: '#7a8ba0' },
+  medium: { background: 'rgba(255,145,0,0.15)', color: '#ff9100' },
+  high: { background: 'rgba(255,56,96,0.15)', color: '#ff3860' },
 };
 
 export default function Tasks() {
@@ -53,13 +58,22 @@ export default function Tasks() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Tasks</h1>
+        <h1 className="text-2xl font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider" style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>Tasks</h1>
         <button className="btn-primary flex items-center gap-2" onClick={() => setShowModal(true)}><Plus size={18} /> Add Task</button>
       </div>
       <div className="flex gap-2">
-        <button className={`px-3 py-1 rounded-full text-sm ${!filter ? 'bg-jarvis-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`} onClick={() => setFilter('')}>All</button>
+        <button
+          className="px-4 py-1 rounded-sm text-sm uppercase tracking-wider font-semibold transition-all"
+          style={!filter ? { background: 'rgba(0,240,255,0.15)', border: '1px solid #00f0ff', color: '#00f0ff' } : { background: 'transparent', border: '1px solid rgba(0,240,255,0.2)', color: '#7a8ba0' }}
+          onClick={() => setFilter('')}
+        >All</button>
         {columns.map((s) => (
-          <button key={s} className={`px-3 py-1 rounded-full text-sm ${filter === s ? 'bg-jarvis-600 text-white' : 'bg-gray-200 dark:bg-gray-700'}`} onClick={() => setFilter(s)}>{STATUS_LABELS[s]}</button>
+          <button
+            key={s}
+            className="px-4 py-1 rounded-sm text-sm uppercase tracking-wider font-semibold transition-all"
+            style={filter === s ? STATUS_BG[s] : { background: 'transparent', border: '1px solid rgba(0,240,255,0.2)', color: '#7a8ba0' }}
+            onClick={() => setFilter(s)}
+          >{STATUS_LABELS[s]}</button>
         ))}
       </div>
       {loading ? (
@@ -71,19 +85,24 @@ export default function Tasks() {
             if (filter && filter !== col) return null;
             return (
               <div key={col} className="space-y-3">
-                <h2 className="font-semibold text-sm uppercase tracking-wide text-gray-500">{STATUS_LABELS[col]} ({colTasks.length})</h2>
+                <h2 className={`font-orbitron text-xs uppercase tracking-wider font-bold ${STATUS_COLORS[col]}`}>{STATUS_LABELS[col]} ({colTasks.length})</h2>
                 {colTasks.map((task) => (
                   <div key={task.id} className="card !p-4 space-y-2">
                     <div className="flex items-start justify-between">
                       <h3 className="font-medium">{task.title}</h3>
-                      <button onClick={() => handleDelete(task.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
+                      <button onClick={() => handleDelete(task.id)} className="text-[#7a8ba0] hover:text-[#ff3860] transition-colors"><Trash2 size={14} /></button>
                     </div>
-                    {task.description && <p className="text-sm text-gray-500 line-clamp-2">{task.description}</p>}
+                    {task.description && <p className="text-sm text-[#7a8ba0] line-clamp-2">{task.description}</p>}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${PRIORITY_COLORS[task.priority]}`}>{task.priority}</span>
-                      {task.due_date && <span className="text-xs text-gray-500">{new Date(task.due_date).toLocaleDateString()}</span>}
+                      <span className="px-2 py-0.5 rounded-sm text-xs font-semibold uppercase tracking-wider" style={PRIORITY_STYLES[task.priority]}>{task.priority}</span>
+                      {task.due_date && <span className="text-xs text-[#7a8ba0]">{new Date(task.due_date).toLocaleDateString()}</span>}
                     </div>
-                    <select value={task.status} onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)} className={`text-xs px-2 py-1 rounded font-medium border-0 ${STATUS_COLORS[task.status]}`}>
+                    <select
+                      value={task.status}
+                      onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
+                      className="text-xs px-2 py-1 rounded-sm font-semibold uppercase tracking-wider cursor-pointer"
+                      style={{ ...STATUS_BG[task.status], outline: 'none' }}
+                    >
                       {columns.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
                     </select>
                   </div>
