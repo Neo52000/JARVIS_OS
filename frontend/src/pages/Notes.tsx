@@ -50,8 +50,8 @@ export default function Notes() {
   const handlePin = async (note: Note) => { await notesAPI.update(note.id, { is_pinned: !note.is_pinned }); fetchNotes(); };
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] gap-4">
-      <div className="w-80 shrink-0 flex flex-col card !p-0 overflow-hidden">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-7rem)] gap-4">
+      <div className="w-full md:w-80 shrink-0 flex flex-col card !p-0 overflow-hidden max-h-[40vh] md:max-h-none">
         <div className="p-3 space-y-2" style={{ borderBottom: '1px solid rgba(0,240,255,0.2)' }}>
           <div className="flex items-center justify-between">
             <h2 className="font-orbitron font-bold text-[#00f0ff] text-xs uppercase tracking-wider">Notes</h2>

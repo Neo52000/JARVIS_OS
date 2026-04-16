@@ -8,19 +8,23 @@ interface Toast {
 
 interface UIState {
   sidebarOpen: boolean;
+  mobileSidebarOpen: boolean;
   theme: 'dark';
   toasts: Toast[];
   toggleSidebar: () => void;
+  setMobileSidebarOpen: (open: boolean) => void;
   addToast: (message: string, type: Toast['type']) => void;
   removeToast: (id: string) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: true,
+  mobileSidebarOpen: false,
   theme: 'dark',
   toasts: [],
 
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  setMobileSidebarOpen: (open) => set({ mobileSidebarOpen: open }),
 
   addToast: (message, type) => {
     const id = Date.now().toString();
