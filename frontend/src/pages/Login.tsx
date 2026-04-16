@@ -26,38 +26,43 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#0a0e17' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-jarvis-600">JARVIS OS</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Système d'exploitation d'entreprise</p>
+          <h1
+            className="text-4xl font-orbitron font-black text-[#00f0ff] tracking-[4px]"
+            style={{ textShadow: '0 0 30px rgba(0,240,255,0.5)' }}
+          >
+            JARVIS
+          </h1>
+          <p className="text-[#7a8ba0] mt-2 uppercase tracking-wider text-sm">Systeme d'exploitation d'entreprise</p>
         </div>
         <form onSubmit={handleSubmit} className="card space-y-4">
-          <h2 className="text-xl font-semibold text-center">Se connecter</h2>
+          <h2 className="text-lg font-orbitron font-bold text-[#00f0ff] text-center uppercase tracking-wider">Se connecter</h2>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+            <div className="p-3 rounded-sm text-sm" style={{ background: 'rgba(255,56,96,0.1)', border: '1px solid rgba(255,56,96,0.3)', color: '#ff3860' }}>
               {error}
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-1">E-mail</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">E-mail</label>
             <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Mot de passe</label>
+            <label className="block text-xs font-semibold text-[#7a8ba0] mb-1 uppercase tracking-wider">Mot de passe</label>
             <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           <div className="text-right">
-            <Link to="/forgot-password" className="text-sm text-jarvis-600 hover:underline">
-              Mot de passe oublié ?
+            <Link to="/forgot-password" className="text-sm text-[#00f0ff] hover:underline">
+              Mot de passe oublie ?
             </Link>
           </div>
           <button type="submit" className="btn-primary w-full" disabled={loading}>
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-[#7a8ba0]">
             Vous n'avez pas de compte ?{' '}
-            <Link to="/register" className="text-jarvis-600 hover:underline">Inscrivez-vous</Link>
+            <Link to="/register" className="text-[#00f0ff] hover:underline">Inscrivez-vous</Link>
           </p>
         </form>
       </div>

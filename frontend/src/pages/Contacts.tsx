@@ -50,41 +50,41 @@ export default function Contacts() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Contacts</h1>
+        <h1 className="text-2xl font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider" style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>Contacts</h1>
         <button className="btn-primary flex items-center gap-2" onClick={() => { setEditingId(null); setForm({ name: '', email: '', phone: '', company: '', position: '' }); setShowModal(true); }}>
           <Plus size={18} /> Add Contact
         </button>
       </div>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7a8ba0]" size={18} />
         <input className="input pl-10" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
       {loading ? (
         <div className="flex justify-center py-10"><LoadingSpinner /></div>
       ) : contacts.length === 0 ? (
-        <p className="text-center text-gray-500 py-10">No contacts found</p>
+        <p className="text-center text-[#7a8ba0] py-10">No contacts found</p>
       ) : (
-        <div className="card overflow-hidden p-0">
+        <div className="card overflow-hidden !p-0">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="text-left p-4 font-medium">Name</th>
-                <th className="text-left p-4 font-medium">Email</th>
-                <th className="text-left p-4 font-medium">Company</th>
-                <th className="text-left p-4 font-medium">Phone</th>
-                <th className="p-4 font-medium w-24">Actions</th>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(0,240,255,0.2)' }}>
+                <th className="text-left p-4 font-orbitron text-[11px] text-[#00f0ff] uppercase tracking-wider">Name</th>
+                <th className="text-left p-4 font-orbitron text-[11px] text-[#00f0ff] uppercase tracking-wider">Email</th>
+                <th className="text-left p-4 font-orbitron text-[11px] text-[#00f0ff] uppercase tracking-wider">Company</th>
+                <th className="text-left p-4 font-orbitron text-[11px] text-[#00f0ff] uppercase tracking-wider">Phone</th>
+                <th className="p-4 font-orbitron text-[11px] text-[#00f0ff] uppercase tracking-wider w-24">Actions</th>
               </tr>
             </thead>
             <tbody>
               {contacts.map((c) => (
-                <tr key={c.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750">
-                  <td className="p-4"><Link to={`/contacts/${c.id}`} className="text-jarvis-600 hover:underline font-medium">{c.name}</Link></td>
-                  <td className="p-4 text-gray-500">{c.email || '\u2014'}</td>
-                  <td className="p-4 text-gray-500">{c.company || '\u2014'}</td>
-                  <td className="p-4 text-gray-500">{c.phone || '\u2014'}</td>
+                <tr key={c.id} className="hover:bg-[rgba(0,240,255,0.03)] transition-colors" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td className="p-4"><Link to={`/contacts/${c.id}`} className="text-[#00f0ff] hover:underline font-medium">{c.name}</Link></td>
+                  <td className="p-4 text-[#7a8ba0]">{c.email || '\u2014'}</td>
+                  <td className="p-4 text-[#7a8ba0]">{c.company || '\u2014'}</td>
+                  <td className="p-4 text-[#7a8ba0]">{c.phone || '\u2014'}</td>
                   <td className="p-4"><div className="flex gap-2 justify-center">
-                    <button onClick={() => handleEdit(c)} className="p-1 hover:text-jarvis-600"><Edit size={16} /></button>
-                    <button onClick={() => handleDelete(c.id)} className="p-1 hover:text-red-500"><Trash2 size={16} /></button>
+                    <button onClick={() => handleEdit(c)} className="p-1 text-[#7a8ba0] hover:text-[#00f0ff] transition-colors"><Edit size={16} /></button>
+                    <button onClick={() => handleDelete(c.id)} className="p-1 text-[#7a8ba0] hover:text-[#ff3860] transition-colors"><Trash2 size={16} /></button>
                   </div></td>
                 </tr>
               ))}

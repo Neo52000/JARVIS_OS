@@ -8,30 +8,19 @@ interface Toast {
 
 interface UIState {
   sidebarOpen: boolean;
-  theme: 'light' | 'dark';
+  theme: 'dark';
   toasts: Toast[];
   toggleSidebar: () => void;
-  setTheme: (theme: 'light' | 'dark') => void;
   addToast: (message: string, type: Toast['type']) => void;
   removeToast: (id: string) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: true,
-  theme: (localStorage.getItem('jarvis_theme') as 'light' | 'dark') || 'light',
+  theme: 'dark',
   toasts: [],
 
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-
-  setTheme: (theme) => {
-    localStorage.setItem('jarvis_theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    set({ theme });
-  },
 
   addToast: (message, type) => {
     const id = Date.now().toString();
