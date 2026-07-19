@@ -19,26 +19,45 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
+  let messages: { role: string; content: string }[];
   try {
-    const { messages } = await req.json();
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response(JSON.stringify({ error: 'messages array is required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const body = await req.json();
+    messages = body.messages;
+  } catch (_err) {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
-    const apiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!apiKey) {
-      return new Response(
-        JSON.stringify({
-          reply:
-            'AI assistant is not configured. Set the OPENAI_API_KEY secret on this Edge Function.',
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return new Response(JSON.stringify({ error: 'messages array is required' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  const isValid = messages.every(
+    (m) => m && typeof m === 'object' && typeof m.role === 'string' && typeof m.content === 'string',
+  );
+  if (!isValid) {
+    return new Response(
+      JSON.stringify({ error: 'Each message must be an object with role and content strings' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
 
+  const apiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({
+        reply:
+          'AI assistant is not configured. Set the OPENAI_API_KEY secret on this Edge Function.',
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -49,10 +68,7 @@ Deno.serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          ...messages.map((m: { role: string; content: string }) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
         ],
         max_tokens: 1000,
         temperature: 0.7,
@@ -72,8 +88,8 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (_err) {
-    return new Response(JSON.stringify({ error: 'Invalid request' }), {
-      status: 400,
+    return new Response(JSON.stringify({ error: 'Failed to communicate with AI service' }), {
+      status: 502,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

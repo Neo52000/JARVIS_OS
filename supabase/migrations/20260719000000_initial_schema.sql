@@ -49,7 +49,7 @@ create table if not exists public.notes (
   user_id uuid not null references auth.users (id) on delete cascade,
   title text not null,
   content text,
-  tags text[] default '{}',
+  tags text[] not null default '{}',
   is_pinned boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -77,11 +77,12 @@ create trigger notes_set_updated_at
   for each row execute function public.set_updated_at();
 
 -- ── indexes ──────────────────────────────────────────────────────────────────
-create index if not exists contacts_user_id_idx on public.contacts (user_id);
-create index if not exists tasks_user_id_idx on public.tasks (user_id);
-create index if not exists events_user_id_idx on public.events (user_id);
-create index if not exists events_time_idx on public.events (start_time, end_time);
-create index if not exists notes_user_id_idx on public.notes (user_id);
+-- Composite indexes starting with user_id: RLS implicitly filters every query
+-- by user_id, and the frontend sorts/filters on the trailing columns.
+create index if not exists contacts_user_id_created_at_idx on public.contacts (user_id, created_at desc);
+create index if not exists tasks_user_id_created_at_idx on public.tasks (user_id, created_at desc);
+create index if not exists events_user_id_time_idx on public.events (user_id, start_time, end_time);
+create index if not exists notes_user_id_pinned_updated_idx on public.notes (user_id, is_pinned desc, updated_at desc);
 
 -- ── row level security ───────────────────────────────────────────────────────
 alter table public.contacts enable row level security;
