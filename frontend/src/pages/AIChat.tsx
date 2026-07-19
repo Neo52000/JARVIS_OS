@@ -21,9 +21,9 @@ export default function AIChat() {
     setLoading(true);
     try {
       const data = await aiAPI.chat(newMessages);
-      setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+      setMessages([...newMessages, { role: 'assistant', content: data.reply, actions: data.actions }]);
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'AI assistant is not configured yet. Deploy the ai-chat Edge Function to enable this feature.' }]);
+      setMessages([...newMessages, { role: 'assistant', content: 'JARVIS is not configured yet. Deploy the jarvis-agent Edge Function and set ANTHROPIC_API_KEY to enable this feature.' }]);
     } finally {
       setLoading(false);
     }
@@ -61,6 +61,19 @@ export default function AIChat() {
                 }
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                {msg.actions && msg.actions.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {msg.actions.map((action, j) => (
+                      <span
+                        key={j}
+                        className="text-[11px] font-rajdhani font-semibold uppercase tracking-wide px-2 py-0.5 rounded-sm text-[#00e676]"
+                        style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.35)' }}
+                      >
+                        ✓ {action.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               {msg.role === 'user' && (
                 <div className="w-8 h-8 rounded-sm flex items-center justify-center text-[#00f0ff] shrink-0" style={{ background: 'rgba(0,240,255,0.15)', border: '1px solid rgba(0,240,255,0.3)' }}>

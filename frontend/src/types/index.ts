@@ -64,7 +64,13 @@ export interface DashboardStats {
   recent_notes: { id: string; title: string; updated_at: string }[];
 }
 
+export interface JarvisAction {
+  type: string;
+  label: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  actions?: JarvisAction[];
 }
