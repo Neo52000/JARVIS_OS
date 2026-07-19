@@ -5,6 +5,7 @@ import { dashboardAPI } from '@/api/endpoints';
 import type { DashboardStats } from '@/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import NeuralCore, { type ActivityMap } from '@/components/NeuralCore';
+import JarvisBriefing from '@/components/JarvisBriefing';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -48,6 +49,7 @@ export default function Dashboard() {
       <h1 className="text-2xl font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider" style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>
         Command Center
       </h1>
+      <JarvisBriefing />
       <div className={coreFullscreen ? 'card fixed inset-0 z-50 rounded-none flex flex-col' : 'card'}>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider flex items-center gap-2">
