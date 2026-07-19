@@ -1,13 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, CheckSquare, CalendarDays, AlertCircle } from 'lucide-react';
+import { Users, CheckSquare, CalendarDays, AlertCircle, Brain, Maximize2, Minimize2 } from 'lucide-react';
 import { dashboardAPI } from '@/api/endpoints';
 import type { DashboardStats } from '@/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import NeuralCore, { type ActivityMap } from '@/components/NeuralCore';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [coreFullscreen, setCoreFullscreen] = useState(false);
+
+  const coreActivity = useMemo<ActivityMap | undefined>(() => {
+    if (!stats) return undefined;
+    return {
+      hippocampus: Math.min(1, stats.recent_notes.length / 5),
+      motor: Math.min(1, (stats.tasks_by_status.in_progress || 0) / 8),
+      prefrontal: Math.min(1, ((stats.tasks_by_status.todo || 0) + stats.tasks_due_today) / 10),
+      association: Math.min(1, stats.total_contacts / 50),
+    };
+  }, [stats]);
 
   useEffect(() => {
     dashboardAPI.getStats().then((data) => {
@@ -36,6 +48,26 @@ export default function Dashboard() {
       <h1 className="text-2xl font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider" style={{ textShadow: '0 0 20px rgba(0,240,255,0.4)' }}>
         Command Center
       </h1>
+      <div className={coreFullscreen ? 'card fixed inset-0 z-50 rounded-none flex flex-col' : 'card'}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-orbitron font-bold text-[#00f0ff] uppercase tracking-wider flex items-center gap-2">
+            <Brain size={18} style={{ filter: 'drop-shadow(0 0 8px #00f0ff)' }} /> Neural Core
+            <span className="text-[10px] font-rajdhani font-medium text-[#7a8ba0] normal-case tracking-normal">
+              cognitive activity monitor
+            </span>
+          </h2>
+          <button
+            onClick={() => setCoreFullscreen((v) => !v)}
+            className="text-[#7a8ba0] hover:text-[#00f0ff] transition-colors"
+            aria-label={coreFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {coreFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
+        <div className={coreFullscreen ? 'flex-1 min-h-0' : 'h-[420px]'}>
+          <NeuralCore activity={coreActivity} />
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <Link to={card.link} key={card.label} className="card hover:shadow-cyan-glow-sm transition-all text-center">
