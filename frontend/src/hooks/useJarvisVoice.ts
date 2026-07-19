@@ -43,17 +43,24 @@ function pickFrenchVoice(): SpeechSynthesisVoice | null {
   );
 }
 
+export // Chrome garbage-collects unreferenced utterances mid-speech, which silently
+// drops the onend event — keep the active one referenced at module level.
+let activeUtterance: SpeechSynthesisUtterance | null = null;
+
 export function speakText(text: string, onEnd?: () => void) {
   const utterance = new SpeechSynthesisUtterance(text);
+  activeUtterance = utterance;
   utterance.lang = 'fr-FR';
   const voice = pickFrenchVoice();
   if (voice) utterance.voice = voice;
   utterance.rate = 1.02;
   utterance.pitch = 0.85; // slightly lower — calm butler register
-  if (onEnd) {
-    utterance.onend = onEnd;
-    utterance.onerror = onEnd;
-  }
+  const handleEnd = () => {
+    if (activeUtterance === utterance) activeUtterance = null;
+    onEnd?.();
+  };
+  utterance.onend = handleEnd;
+  utterance.onerror = handleEnd;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);
 }
@@ -84,6 +91,9 @@ export function useJarvisVoice(active: boolean) {
   }, []);
 
   const handleCommand = useCallback(async (command: string) => {
+    // Update the ref synchronously: stopRecognition() fires onend before React
+    // re-renders, and onend must not restart recognition while we think.
+    stateRef.current = 'thinking';
     stopRecognition();
     setState('thinking');
     setTranscript(command);
@@ -187,6 +197,7 @@ export function useJarvisVoice(active: boolean) {
       setError(null);
       setState('listening');
       setTranscript('');
+      setMessages([]);
       startRecognition();
     } else {
       awakeRef.current = false;
@@ -208,6 +219,13 @@ export function useJarvisVoice(active: boolean) {
       if (document.hidden) {
         stopRecognition();
         window.speechSynthesis.cancel();
+        // cancel() may not fire the utterance callback — don't stay stuck in
+        // 'speaking' with nothing playing.
+        if (stateRef.current === 'speaking') {
+          stateRef.current = 'listening';
+          setState('listening');
+          setTranscript('');
+        }
       } else if (activeRef.current && stateRef.current === 'listening') {
         startRecognition();
       }

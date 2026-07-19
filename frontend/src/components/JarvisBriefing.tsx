@@ -6,7 +6,9 @@ import { speakText } from '@/hooks/useJarvisVoice';
 const STORAGE_KEY = 'jarvis_briefing_date';
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Local date, not UTC — otherwise the briefing fires twice around midnight.
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 /**

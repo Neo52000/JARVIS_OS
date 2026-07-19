@@ -20,6 +20,22 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Edge Functions run in UTC but the user lives in Europe/Paris — compute the
+// user's day boundaries, not the server's.
+function parisDayBounds(): { dayStart: Date; dayEnd: Date } {
+  const now = new Date();
+  const parisWallClock = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+  const offset = now.getTime() - parisWallClock.getTime();
+  const start = new Date(parisWallClock);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(parisWallClock);
+  end.setHours(23, 59, 59, 999);
+  return {
+    dayStart: new Date(start.getTime() + offset),
+    dayEnd: new Date(end.getTime() + offset),
+  };
+}
+
 function systemPrompt(now: string): string {
   return (
     'You are JARVIS, a personal business assistant in the spirit of the film: a precise, ' +
@@ -180,9 +196,11 @@ async function runTool(
     }
     case 'create_event': {
       const start = new Date(input.start_time as string);
+      if (isNaN(start.getTime())) throw new Error(`Invalid start_time: ${input.start_time}`);
       const end = input.end_time
         ? new Date(input.end_time as string)
         : new Date(start.getTime() + 60 * 60 * 1000);
+      if (isNaN(end.getTime())) throw new Error(`Invalid end_time: ${input.end_time}`);
       const { data, error } = await db
         .from('events')
         .insert({
@@ -274,8 +292,7 @@ async function runTool(
     }
     case 'get_agenda': {
       const now = new Date();
-      const dayStart = new Date(now); dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(now); dayEnd.setHours(23, 59, 59, 999);
+      const { dayStart, dayEnd } = parisDayBounds();
       const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       const [dueToday, overdue, upcoming, openCount] = await Promise.all([
         db.from('tasks').select('id, title, priority')

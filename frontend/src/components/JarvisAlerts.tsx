@@ -15,6 +15,7 @@ export default function JarvisAlerts() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY)) return;
     let cancelled = false;
 
     const check = async () => {
