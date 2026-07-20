@@ -153,13 +153,13 @@ export const dashboardAPI = {
   },
 };
 
-// AI Chat (calls Supabase Edge Function)
+// JARVIS agent (Supabase Edge Function with tool use — it acts on real data)
 export const aiAPI = {
   chat: async (messages: { role: string; content: string }[]) => {
-    const { data, error } = await supabase.functions.invoke('ai-chat', {
-      body: { messages },
+    const { data, error } = await supabase.functions.invoke('jarvis-agent', {
+      body: { messages: messages.map(({ role, content }) => ({ role, content })) },
     });
     if (error) throw error;
-    return data as { reply: string };
+    return data as { reply: string; actions: import('@/types').JarvisAction[] };
   },
 };
