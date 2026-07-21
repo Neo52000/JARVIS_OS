@@ -21,6 +21,30 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initialize: async () => {
     const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      // Single-user personal deployment: skip the login screen by signing in
+      // with a fixed account. RLS still applies — this only removes the
+      // manual login step, it does not weaken data isolation. No-op (falls
+      // through to the normal login screen) if the env vars aren't set.
+      const autoEmail = import.meta.env.VITE_JARVIS_AUTO_LOGIN_EMAIL;
+      const autoPassword = import.meta.env.VITE_JARVIS_AUTO_LOGIN_PASSWORD;
+      if (autoEmail && autoPassword) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: autoEmail,
+          password: autoPassword,
+        });
+        if (!error) {
+          set({ user: data.user, isAuthenticated: true, isLoading: false });
+          supabase.auth.onAuthStateChange((_event, session) => {
+            set({ user: session?.user ?? null, isAuthenticated: !!session?.user });
+          });
+          return;
+        }
+        console.warn('JARVIS auto-login failed, falling back to manual login:', error.message);
+      }
+    }
+
     set({
       user: session?.user ?? null,
       isAuthenticated: !!session?.user,

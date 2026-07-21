@@ -68,7 +68,8 @@ follow `supabase/README.md`.
 |---|---|---|
 | `VITE_SUPABASE_URL` | frontend build (local `.env`, Netlify) | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | frontend build (local `.env`, Netlify) | Supabase anon (public) key |
-| `OPENAI_API_KEY` | Supabase Edge Function secret | Enables the AI chat |
+| `VITE_JARVIS_AUTO_LOGIN_EMAIL` / `VITE_JARVIS_AUTO_LOGIN_PASSWORD` | frontend build (local `.env`, Netlify) | Optional — single-user deployments only. Auto-signs in with this account on load, skipping the login screen. RLS still applies. Leave unset for multi-user deployments. |
+| `ANTHROPIC_API_KEY` | Supabase Edge Function secret | Enables the JARVIS agent (`jarvis-agent`) |
 
 ## Deployment
 
